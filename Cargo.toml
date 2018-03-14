@@ -1,0 +1,13 @@
+[package]
+name = "pingos"
+version = "0.1.0"
+authors = ["lausek <root@lausek.eu>"]
+
+[dependencies]
+rlibc = "1.0"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
