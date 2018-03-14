@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# TODO: check if installed
+xargo build --target x86_64-pingos
+
+# TODO: check if installed
+bootimage --target x86_64-pingos
+
+case $1 in
+"run")
+    # TODO: check if installed
+    qemu-system-x86_64 -drive format=raw,file=bootimage.bin
+esac
