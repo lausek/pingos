@@ -1,13 +1,32 @@
 #!/bin/bash
 
-# TODO: check if installed
-xargo build --target x86_64-pingos
+
+for arg in $@; do
+    case $arg in
+        "run")
+            op_run=true
+            ;;
+        "clean")
+            op_clean=true
+            ;;
+    esac
+done
+
+if $op_clean; then
+    rm -rf target
+fi
 
 # TODO: check if installed
-bootimage --target x86_64-pingos
+RUST_TARGET_PATH=$PWD xargo build --target x86_64-pingos
 
-case $1 in
-"run")
+if [ $? -eq 0 ]; then
+
     # TODO: check if installed
-    qemu-system-x86_64 -drive format=raw,file=bootimage.bin
-esac
+    bootimage --target x86_64-pingos
+
+    if $op_run; then
+        # TODO: check if installed
+        qemu-system-x86_64 -drive format=raw,file=bootimage.bin
+    fi
+
+fi;
