@@ -1,5 +1,6 @@
 #!/bin/bash
-
+op_run=false
+op_clean=false
 
 for arg in $@; do
     case $arg in
