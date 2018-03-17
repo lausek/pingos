@@ -1,7 +1,4 @@
 #!/bin/bash
-op_run=false
-op_clean=false
-
 for arg in $@; do
     case $arg in
         "run")
@@ -13,21 +10,25 @@ for arg in $@; do
     esac
 done
 
-if $op_clean; then
+if [ "$op_clean" = true ]; then
+    echo "Clearing..."
     rm -rf target
 fi
 
 # TODO: check if installed
+echo "Building..."
 RUST_TARGET_PATH=$PWD xargo build --target x86_64-pingos
 
 if [ $? -eq 0 ]; then
 
     # TODO: check if installed
+    echo "Creating image..."
     bootimage --target x86_64-pingos
 
-    if $op_run; then
+    if [ "$op_run" = true ]; then
         # TODO: check if installed
+        echo "Executing..."
         qemu-system-x86_64 -drive format=raw,file=bootimage.bin
     fi
 
-fi;
+fi
