@@ -1,3 +1,4 @@
+use core::fmt;
 use graphics;
 
 #[derive(Debug, Clone, Copy)]
@@ -67,5 +68,12 @@ impl Writer {
         let lines = self.buffer.height.clone() - 1;
         self.clear_line(lines);
         self.column_position = 0; 
+    }
+}
+
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_str(s);
+        Ok(())
     }
 }

@@ -33,7 +33,7 @@ pub struct Buffer<'a, T: 'a> {
 
 impl <'a, T> Buffer<'a, T> {
     
-    pub fn new(width: usize, height: usize) -> Buffer<'a, T> {
+    pub fn new() -> Buffer<'a, T> {
         Buffer {
             chars: unsafe { &mut *(0xb8000 as *mut [[T; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
             height: BUFFER_HEIGHT,

@@ -10,15 +10,17 @@ mod vga;
 
 use vga::Writer;
 
-static HELLO: &[u8] = b"Hello World";
-
 #[no_mangle]
 pub extern fn _start() -> ! {
+    
+    use core::fmt::Write;
 
     let mut writer = Writer::new();
-    
+    let mut i = 0;
+
     loop {
-        writer.write_str("Hello World\n");
+        i += 1;
+        write!(writer, "Hello World x{}\n", i);
     }
 
     loop {}
