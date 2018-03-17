@@ -1,3 +1,7 @@
+extern crate volatile;
+
+use self::volatile::Volatile;
+
 const BUFFER_WIDTH: usize = 80;
 const BUFFER_HEIGHT: usize = 25;
 
@@ -24,18 +28,19 @@ impl ColorCode {
     }
 }
 
-#[repr(C)]
-pub struct Buffer<'a, T: 'a> {
-    pub chars: &'a mut [[T; 80]; 25],
+pub struct Buffer<T: 'static + Copy> {
+    pub chars: &'static mut [[Volatile<T>; BUFFER_WIDTH]; BUFFER_HEIGHT],
     pub height: usize,
     pub width: usize,
 }
 
-impl <'a, T> Buffer<'a, T> {
+impl <T> Buffer<T>
+    where T: Copy
+{
     
-    pub fn new() -> Buffer<'a, T> {
+    pub fn new() -> Buffer<T> {
         Buffer {
-            chars: unsafe { &mut *(0xb8000 as *mut [[T; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
+            chars: unsafe { &mut *(0xb8000 as *mut [[Volatile<T>; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
             height: BUFFER_HEIGHT,
             width: BUFFER_WIDTH,
         } 

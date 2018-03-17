@@ -1,25 +1,38 @@
+extern crate volatile;
+
 use core::fmt;
-use graphics;
+use graphics::{Buffer, Color, ColorCode};
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct ScreenChar {
     character: u8,
-    color: graphics::ColorCode,
+    color: ColorCode,
+}
+
+impl ScreenChar {
+    
+    pub const fn new(character: u8, color: ColorCode) -> ScreenChar {
+        ScreenChar {
+            character,
+            color,
+        }
+    }
+
 }
 
 pub struct Writer {
     column_position: usize,
-    color_code: graphics::ColorCode,
-    buffer: graphics::Buffer<'static, ScreenChar>,
+    color_code: ColorCode,
+    buffer: Buffer<ScreenChar>,
 }
 
 impl Writer {
     pub fn new() -> Writer {
         Writer {
             column_position: 0,
-            color_code: graphics::ColorCode::new(graphics::Color::White, graphics::Color::Black),
-            buffer: graphics::Buffer::<ScreenChar>::new(),
+            color_code: ColorCode::new(Color::White, Color::Black),
+            buffer: Buffer::<ScreenChar>::new(),
         }
     }
 
@@ -40,28 +53,27 @@ impl Writer {
                 let row = self.buffer.height - 1;
                 let col = self.column_position;
 
-                self.buffer.chars[row][col] = ScreenChar {
+                self.buffer.chars[row][col].write(ScreenChar {
                     character: byte,
                     color: self.color_code,
-                };
+                });
                 self.column_position += 1;
             }
         } 
     }
     
     fn clear_line(&mut self, line: usize) {
+        let color = ColorCode::new(Color::White, Color::Black);
         for x in 0..self.buffer.width {
-            self.buffer.chars[line][x] = ScreenChar {
-                character: 0x20,
-                color: graphics::ColorCode::new(graphics::Color::White, graphics::Color::Black),
-            };
+            self.buffer.chars[line][x].write(ScreenChar::new(0x20, color));
         }
     }
 
     fn new_line(&mut self) {
         for y in 1..self.buffer.height {
             for x in 0..self.buffer.width-1 {   
-                self.buffer.chars[y-1][x] = self.buffer.chars[y][x];
+                let c = self.buffer.chars[y][x].read();
+                self.buffer.chars[y-1][x].write(c);
             }
         }
    

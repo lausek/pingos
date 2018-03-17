@@ -20,7 +20,7 @@ pub extern fn _start() -> ! {
 
     loop {
         i += 1;
-        write!(writer, "Hello World x{}\n", i);
+        write!(writer, "Hello World x{}\n", i).ok();
     }
 
     loop {}
