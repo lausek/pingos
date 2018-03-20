@@ -3,6 +3,9 @@ name = "pingos"
 version = "0.1.0"
 authors = ["lausek <root@lausek.eu>"]
 
+[lib]
+crate-type = ["staticlib"]
+
 [dependencies]
 rlibc = "1.0"
 volatile = "0.2.3"

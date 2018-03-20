@@ -1,6 +1,8 @@
 # set if arch doesn't have a value
 arch ?= x86_64
-target_dir := target
+target_dir := build
+target = $(arch)-target
+rust_os := target/$(target)/debug/libpingos.a
 
 # := set immediately
 kernel := $(target_dir)/kernel-$(arch).bin
@@ -36,8 +38,12 @@ $(iso): $(kernel) $(grub_cfg)
 	@grub-mkrescue -o $(iso) $(target_dir)/iso 2> /dev/null
 	@rm -r $(target_dir)/iso
 
-$(kernel): $(asm_object) $(linker_script)
-	@ld -n -T $(linker_script) -o $(kernel) $(asm_object)
+$(kernel): kernel $(rust_os) $(asm_object) $(linker_script)
+	@ld -n --gc-sections -T $(linker_script) -o $(kernel) \
+		$(asm_object) $(rust_os)
+
+kernel:
+	@RUST_TARGET_PATH=$(shell pwd) xargo build --target $(target)
 
 $(target_dir)/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	@mkdir -p $(shell dirname $@)
