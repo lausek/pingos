@@ -1,5 +1,4 @@
 section .multiboot_header
-
 header_start:
     dd 0xe85250d6                   ; magic number
     dd 0                            ; arch
@@ -11,6 +10,5 @@ header_start:
 
     dw 0                            ; type
     dw 0                            ; flags
-    dd 0                            ; size
-
+    dd 8                            ; size
 header_end:
