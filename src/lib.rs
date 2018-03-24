@@ -10,6 +10,16 @@ mod vga;
 
 use vga::Writer;
 
+#[repr(C)]
+struct gdt_entry {
+    limit_low: u16,
+    base_low: u16,
+    base_middle: u8,
+    access: u8,
+    granularity: u8,
+    base_high: u8,
+}
+
 #[no_mangle]
 pub extern fn _start() -> ! {
     
