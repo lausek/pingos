@@ -21,7 +21,7 @@ struct gdt_entry {
 }
 
 #[no_mangle]
-pub extern fn _start() -> ! {
+pub extern fn kmain() -> ! {
     
     use core::fmt::Write;
 
