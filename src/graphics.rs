@@ -1,5 +1,7 @@
 extern crate volatile;
 
+use vga::ScreenChar;
+use core::ptr::Unique;
 use self::volatile::Volatile;
 
 const BUFFER_WIDTH: usize = 80;
@@ -28,19 +30,19 @@ impl ColorCode {
     }
 }
 
-pub struct Buffer<T: 'static + Copy> {
-    pub chars: &'static mut [[Volatile<T>; BUFFER_WIDTH]; BUFFER_HEIGHT],
+pub type VgaBuffer = [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT];
+
+pub struct Buffer {
+    pub chars: Unique<VgaBuffer>, //&'static mut [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
     pub height: usize,
     pub width: usize,
 }
 
-impl <T> Buffer<T>
-    where T: Copy
-{
+impl Buffer {
     
-    pub fn new() -> Buffer<T> {
+    pub const fn new() -> Buffer {
         Buffer {
-            chars: unsafe { &mut *(0xb8000 as *mut [[Volatile<T>; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
+            chars: unsafe { Unique::new_unchecked(0xb8000 as *mut _) }, //unsafe { &mut *(0xb8000 as *mut [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
             height: BUFFER_HEIGHT,
             width: BUFFER_WIDTH,
         } 
