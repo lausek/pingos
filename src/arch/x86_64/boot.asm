@@ -9,7 +9,6 @@ start:
     mov esp, stack_top
 
     ; more bootloader stuff goes here
-    
     call check_multiboot
     call check_cpuid
     call check_long_mode
@@ -159,5 +158,5 @@ p2:
     resb 4096
 ; initialize stack
 stack_bottom:
-    resb 64
+    resb 4096 * 4
 stack_top:

@@ -27,6 +27,8 @@ pub extern fn kmain() -> ! {
 
     let mut writer = Writer::new();
     let mut i = 0;
+    
+    let tokens = ["Hello"];
 
     loop {
         i += 1;
