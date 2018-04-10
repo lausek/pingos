@@ -7,6 +7,8 @@ start:
     
     ; set stack pointer
     mov esp, stack_top
+    ; set multiboot info
+    mov edi, ebx
 
     ; more bootloader stuff goes here
     call check_multiboot

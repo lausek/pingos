@@ -4,6 +4,7 @@
 #![no_main]
 
 extern crate rlibc;
+extern crate multiboot2;
 
 mod graphics;
 mod vga;
@@ -21,18 +22,16 @@ struct gdt_entry {
 }
 
 #[no_mangle]
-pub extern fn kmain() -> ! {
+pub extern fn kmain(multiboot_adr: usize) -> ! {
     
     use core::fmt::Write;
 
+    let boot_info = unsafe { multiboot2::load(multiboot_adr) };
+    let memory_map = boot_info.memory_map_tag().expect("No memory map tag");
     let mut writer = Writer::new();
-    let mut i = 0;
-    
-    let tokens = ["Hello"];
 
-    loop {
-        i += 1;
-        write!(writer, "Hello World x{}\n", i).ok();
+    for area in memory_map.memory_areas() {
+        write!(writer, "start 0x{} length: 0x{}\n", area.base_addr, area.length).ok();
     }
 
     loop {}
@@ -40,7 +39,7 @@ pub extern fn kmain() -> ! {
 
 #[lang = "panic_fmt"]
 #[no_mangle]
-pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
+pub extern fn panic_fmt(_msg: core::fmt::Arguments,
     _file: &'static str, _line: u32, _column: u32) -> ! {
     loop {}
 }
