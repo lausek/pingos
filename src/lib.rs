@@ -32,10 +32,15 @@ pub extern fn kmain(multiboot_adr: usize) -> ! {
 
     let boot_info = unsafe { multiboot2::load(multiboot_adr) };
     let memory_map = boot_info.memory_map_tag().expect("No memory map tag");
+    let elf_sections = boot_info.elf_sections_tag().expect("No elf-sections");
 
     for area in memory_map.memory_areas() {
         write!(WRITER.lock(), "start 0x{} length: 0x{}\n", area.base_addr, area.length).ok();
     }
+
+    for section in elf_sections.sections() {
+        write!(WRITER.lock(), "addr: 0x{:x}, size: 0x{:x}, flags: 0x{:x}\n", section.addr, section.size, section.flags).ok();
+    } 
 
     loop {}
 }
@@ -44,8 +49,6 @@ pub extern fn kmain(multiboot_adr: usize) -> ! {
 #[no_mangle]
 pub extern fn panic_fmt(_msg: core::fmt::Arguments,
     file: &'static str, line: u32, column: u32) -> ! {
-    
     write!(WRITER.lock(), "Panic in {} on {}:{}", file, line, column).ok();
-
     loop {}
 }
