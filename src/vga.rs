@@ -29,7 +29,7 @@ impl Writer {
     pub const fn new() -> Writer {
         Writer {
             column_position: 0,
-            color_code: ColorCode::new(Color::White, Color::Black),
+            color_code: ColorCode::new(Color::Green, Color::Black),
             buffer: Buffer::new(),
         }
     }

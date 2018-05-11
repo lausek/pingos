@@ -38,6 +38,18 @@ pub extern fn kmain(multiboot_adr: usize) -> ! {
         write!(WRITER.lock(), "start 0x{} length: 0x{}\n", area.base_addr, area.length).ok();
     }
 
+    let (mut kstart, mut kend) = (0, 0);
+    for s in elf_sections.sections() {
+        if kstart < s.addr {
+            kstart = s.addr;
+        }
+        let top = s.addr + s.size;
+        if kend < top {
+            kend = top;
+        }
+    }
+
+    write!(WRITER.lock(), "kernel sections:\n");
     for section in elf_sections.sections() {
         write!(WRITER.lock(), "addr: 0x{:x}, size: 0x{:x}, flags: 0x{:x}\n", section.addr, section.size, section.flags).ok();
     } 

@@ -2,7 +2,6 @@ global long_mode_start
 
 section .text
 bits 64
-
 long_mode_start:
     ; reset data registers
     mov ax, 0
@@ -11,7 +10,7 @@ long_mode_start:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    
+
     ; call kernel main function
     extern kmain
     call kmain

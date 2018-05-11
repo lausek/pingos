@@ -33,7 +33,7 @@ impl ColorCode {
 pub type VgaBuffer = [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT];
 
 pub struct Buffer {
-    pub chars: Unique<VgaBuffer>, //&'static mut [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    pub chars: Unique<VgaBuffer>,
     pub height: usize,
     pub width: usize,
 }
@@ -42,7 +42,7 @@ impl Buffer {
     
     pub const fn new() -> Buffer {
         Buffer {
-            chars: unsafe { Unique::new_unchecked(0xb8000 as *mut _) }, //unsafe { &mut *(0xb8000 as *mut [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT]) },
+            chars: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
             height: BUFFER_HEIGHT,
             width: BUFFER_WIDTH,
         } 
