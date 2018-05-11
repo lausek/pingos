@@ -43,7 +43,7 @@ $(kernel): kernel $(rust_os) $(asm_object) $(linker_script)
 		$(asm_object) $(rust_os)
 
 kernel:
-	@RUST_TARGET_PATH=$(shell pwd) xargo build --target $(target)
+	@cargo xbuild --target $(target)
 
 $(target_dir)/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	@mkdir -p $(shell dirname $@)
