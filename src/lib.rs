@@ -10,10 +10,13 @@ extern crate spin;
 
 mod graphics;
 mod vga;
+mod memory;
 
 use spin::Mutex;
 use core::fmt::Write;
 use vga::Writer;
+
+use memory::FrameAllocator;
 
 static WRITER: Mutex<Writer> = Mutex::new(Writer::new());
 
@@ -27,6 +30,22 @@ struct gdt_entry {
     base_high: u8,
 }
 
+fn get_kernel_space(sections: multiboot2::ElfSectionIter) -> (usize, usize) {
+    let mut space: (usize, usize) = (0, 0);
+    for s in sections {
+        let bot = s.addr as usize;
+        let top = (s.addr + s.size) as usize;
+
+        if space.0 < bot {
+            space.0 = bot;
+        }
+        if space.1 < top {
+            space.1 = top;
+        }
+    }
+    space
+}
+
 #[no_mangle]
 pub extern fn kmain(multiboot_adr: usize) -> ! {
 
@@ -38,22 +57,23 @@ pub extern fn kmain(multiboot_adr: usize) -> ! {
         write!(WRITER.lock(), "start 0x{} length: 0x{}\n", area.base_addr, area.length).ok();
     }
 
-    let (mut kstart, mut kend) = (0, 0);
-    for s in elf_sections.sections() {
-        if kstart < s.addr {
-            kstart = s.addr;
-        }
-        let top = s.addr + s.size;
-        if kend < top {
-            kend = top;
-        }
-    }
-
     write!(WRITER.lock(), "kernel sections:\n");
     for section in elf_sections.sections() {
         write!(WRITER.lock(), "addr: 0x{:x}, size: 0x{:x}, flags: 0x{:x}\n", section.addr, section.size, section.flags).ok();
     } 
 
+    let (kstart, kend) = get_kernel_space(elf_sections.sections());
+    let (mstart, mend) = (boot_info.start_address(), boot_info.end_address());
+
+    let mut alloc = memory::allocator::AreaFrameAllocator::new(kstart, kend, mstart, mend, memory_map.memory_areas()); 
+
+    for i in 0.. {
+        if let None = alloc.allocate_frame() {
+            write!(WRITER.lock(), "allocated {} frames\n", i);
+            break;
+        }
+    }
+        
     loop {}
 }
 
