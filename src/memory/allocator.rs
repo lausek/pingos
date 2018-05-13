@@ -25,10 +25,16 @@ impl AreaFrameAllocator {
         }
 
     fn next_area(&mut self) {
-        self.current_area = self.areas.next();
+        self.current_area = self.areas.clone().filter(|area| {
+            let a = area.base_addr + area.length - 1; 
+            self.next_free_frame <= Frame::from_addr(a as usize)
+        }).min_by_key(|a| a.base_addr);
 
         if let Some(area) = self.current_area {
-            self.next_free_frame = Frame::from_addr(area.base_addr as usize);
+            let f = Frame::from_addr(area.base_addr as usize);
+            if self.next_free_frame < f {
+                self.next_free_frame = f; 
+            }
         }
     }
 }

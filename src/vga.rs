@@ -1,7 +1,17 @@
 extern crate volatile;
 
-use core::fmt;
+use core::{fmt, fmt::Write};
+use spin::Mutex;
 use graphics::{Buffer, Color, ColorCode, VgaBuffer};
+
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer::new()); 
+}
+
+macro_rules! vga_write {
+    ($str:expr) => (write!(::vga::WRITER.lock(), "{}", $str).ok());
+    ($str:expr, $($args:ident),*) => (write!(::vga::WRITER.lock(), "{}", $str, $($args),*).ok());
+}
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
