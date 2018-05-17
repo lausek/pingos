@@ -3,13 +3,14 @@
 #![feature(ptr_internals)]
 #![feature(abi_x86_interrupt)]
 #![no_std]
-#![no_main]
 
 extern crate multiboot2;
 extern crate rlibc;
 extern crate spin;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate bitflags;
 
 mod memory;
 mod interrupt;
@@ -47,7 +48,7 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
 
     memory::init(boot_info);
 
-    //interrupt::init();
+    interrupt::init();
 
     loop {}
 }

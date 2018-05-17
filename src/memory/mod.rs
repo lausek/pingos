@@ -2,14 +2,10 @@ extern crate multiboot2;
 
 use multiboot2::BootInformation;
 
-pub mod allocator;
+pub mod alloc;
+pub mod paging;
 
 pub const PAGE_SIZE: usize = 4096;
-
-pub trait FrameAllocator {
-    fn allocate_frame(&mut self) -> Option<Frame>;
-    fn deallocate_frame(&mut self, frame: Frame);
-}
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
@@ -48,6 +44,6 @@ pub fn init(boot_info: &BootInformation) {
     let (kstart, kend) = get_kernel_space(elf_sections.sections());
     let (mstart, mend) = (boot_info.start_address(), boot_info.total_size as usize);
 
-    let mut alloc = allocator::AreaFrameAllocator::new(kstart, kend, mstart, mend, memory_map.memory_areas()); 
+    let mut alloc = alloc::fallocator::AreaFrameAllocator::new(kstart, kend, mstart, mend, memory_map.memory_areas()); 
 
 }
