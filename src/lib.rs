@@ -1,4 +1,5 @@
 #![feature(lang_items)]
+#![feature(panic_implementation)]
 #![feature(const_fn)]
 #![feature(ptr_internals)]
 #![feature(abi_x86_interrupt)]
@@ -12,22 +13,15 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 
+#[macro_use]
+mod vga;
+
 mod memory;
 mod interrupt;
 mod graphics;
 
-#[macro_use]
-mod vga;
-#[macro_use]
-mod log;
-
 use core::fmt::Write;
-use spin::Mutex;
-use log::Logger;
-
-lazy_static! {
-    pub static ref SYSLOG: Mutex<Logger> = Mutex::new(Logger::new());
-}
+use core::panic::PanicInfo;
 
 //#[repr(C)]
 //struct gdt_entry {
@@ -44,7 +38,7 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
 
     let boot_info = unsafe { multiboot2::load(mboot_addr) };
     
-    log!(SYSLOG, "starting...");
+    vga_write!("starting...");
 
     memory::init(boot_info);
 
@@ -53,10 +47,9 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
     loop {}
 }
 
-#[lang = "panic_fmt"]
+#[panic_implementation]
 #[no_mangle]
-pub extern fn panic_fmt(_msg: core::fmt::Arguments,
-    file: &'static str, line: u32, column: u32) -> ! {
-    log!(SYSLOG, "Panic in {} on {}:{}");//, file, line, column);
+pub extern fn panic_fmt(pi: &PanicInfo) -> ! {
+    vga_write!("Panic in {} on {}:{}");
     loop {}
 }

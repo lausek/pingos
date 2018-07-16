@@ -26,7 +26,7 @@ clean:
 	@rm -r $(target_dir)
 
 run: $(iso)
-	# TODO: don't hardcode arch here
+# TODO: don't hardcode arch here
 	@qemu-system-x86_64 -cdrom $(iso)
 
 iso: $(iso)
