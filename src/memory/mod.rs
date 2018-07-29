@@ -5,6 +5,11 @@ use multiboot2::BootInformation;
 pub mod alloc;
 pub mod paging;
 
+extern {
+    static mut HEAP_BOTTOM: u8;
+    static mut HEAP_TOP: u8;
+}
+
 pub const PAGE_SIZE: usize = 4096;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

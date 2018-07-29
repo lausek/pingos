@@ -152,12 +152,15 @@ section .bss
 ; required by paging
 ; resb = reserve X bytes uninitialized memory
 align 4096
+HEAP_BOTTOM:
 p4:
     resb 4096
 p3:
     resb 4096
 p2:
     resb 4096
+HEAP_TOP:
+
 ; initialize stack
 stack_bottom:
     resb 4096 * 4

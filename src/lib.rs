@@ -43,7 +43,7 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
     memory::init(boot_info);
 
     interrupt::init();
-
+    
     loop {}
 }
 
