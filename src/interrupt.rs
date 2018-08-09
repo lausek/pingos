@@ -34,16 +34,24 @@ lazy_static! {
     };
 }
 
-extern "x86-interrupt" fn handler(stack_frame: &mut ExceptionStackFrame) {
-    vga_println!("exception");
+extern "x86-interrupt" fn handler(frame: &mut ExceptionStackFrame) {
+    vga_println!("Exception:\n ip: {}\n cs: {}\n flags: {}\n sp: {}\n ss: {}", 
+                 frame.instruction_pointer, frame.code_segment, frame.cpu_flags,
+                 frame.stack_pointer, frame.stack_segment);
 }
 
-extern "x86-interrupt" fn handler_page_fault(stack_frame: &mut ExceptionStackFrame, code: PageFaultErrorCode) {
-    vga_println!("page fault");
+extern "x86-interrupt" fn handler_page_fault(frame: &mut ExceptionStackFrame, code: PageFaultErrorCode) {
+    vga_println!("Exception ({}):\n ip: {}\n cs: {}\n flags: {}\n sp: {}\n ss: {}", 
+                 "PAGE",
+                 frame.instruction_pointer, frame.code_segment, frame.cpu_flags,
+                 frame.stack_pointer, frame.stack_segment);
 }
 
-extern "x86-interrupt" fn handler_with_err_code(stack_frame: &mut ExceptionStackFrame, code: u64) {
-    vga_println!("exception with error code: {}", code);
+extern "x86-interrupt" fn handler_with_err_code(frame: &mut ExceptionStackFrame, code: u64) {
+    vga_println!("Exception ({}):\n ip: {}\n cs: {}\n flags: {}\n sp: {}\n ss: {}", 
+                 code,
+                 frame.instruction_pointer, frame.code_segment, frame.cpu_flags,
+                 frame.stack_pointer, frame.stack_segment);
 }
 
 pub fn init() {
