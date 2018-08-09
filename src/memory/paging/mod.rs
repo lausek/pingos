@@ -1,5 +1,3 @@
-use memory::{Frame, PAGE_SIZE};
-
 const ENTRY_COUNT: usize = 512;
 
 pub type PhysicalAddress = usize;

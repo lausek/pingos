@@ -1,5 +1,4 @@
 use memory::Frame;
-use multiboot2::{MemoryAreaIter, MemoryArea};
 
 pub mod fallocator;
 

@@ -1,16 +1,17 @@
 extern crate volatile;
 
-use core::{fmt, fmt::Write};
+use core::{fmt, ptr::Unique};
 use spin::Mutex;
-use graphics::{Buffer, Color, ColorCode, VgaBuffer};
+use graphics::color::{Color, ColorCode};
+use self::volatile::Volatile;
+
+const BUFFER_WIDTH: usize = 80;
+const BUFFER_HEIGHT: usize = 25;
+
+pub type VgaBuffer = [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT];
 
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer::new()); 
-}
-
-macro_rules! vga_write {
-    ($str:expr) => (write!(::vga::WRITER.lock(), "{}", $str).ok());
-    ($str:expr, $($args:ident),*) => (write!(::vga::WRITER.lock(), "{}", $str, $($args),*).ok());
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -32,7 +33,7 @@ impl ScreenChar {
 pub struct Writer {
     column_position: usize,
     color_code: ColorCode,
-    buffer: Buffer,
+    chars: Unique<VgaBuffer>,
 }
 
 impl Writer {
@@ -40,12 +41,14 @@ impl Writer {
         Writer {
             column_position: 0,
             color_code: ColorCode::new(Color::Green, Color::Black),
-            buffer: Buffer::new(),
+            chars: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
         }
     }
-    
-    fn buffer(&mut self) -> &mut VgaBuffer {
-        unsafe { self.buffer.chars.as_mut() }
+   
+    fn chars(&mut self) -> &mut VgaBuffer {
+        unsafe {
+            self.chars.as_mut()
+        }
     }
 
     pub fn write_str(&mut self, content: &str) {
@@ -58,15 +61,15 @@ impl Writer {
         match byte {
             b'\n' => self.new_line(),
             byte => {
-                if self.buffer.width <= self.column_position {
+                if BUFFER_WIDTH <= self.column_position {
                     self.new_line();
                 }
 
-                let row = self.buffer.height - 1;
+                let row = BUFFER_HEIGHT - 1;
                 let col = self.column_position;
                 let color = self.color_code;
 
-                self.buffer()[row][col].write(ScreenChar {
+                self.chars()[row][col].write(ScreenChar {
                     character: byte,
                     color: color,
                 });
@@ -77,20 +80,20 @@ impl Writer {
     
     fn clear_line(&mut self, line: usize) {
         let color = ColorCode::new(Color::White, Color::Black);
-        for x in 0..self.buffer.width {
-            self.buffer()[line][x].write(ScreenChar::new(0x20, color));
+        for x in 0..BUFFER_WIDTH {
+            self.chars()[line][x].write(ScreenChar::new(0x20, color));
         }
     }
 
     fn new_line(&mut self) {
-        for y in 1..self.buffer.height {
-            for x in 0..self.buffer.width-1 {   
-                let c = self.buffer()[y][x].read();
-                self.buffer()[y-1][x].write(c);
+        for y in 1..BUFFER_HEIGHT {
+            for x in 0..BUFFER_WIDTH-1 {   
+                let c = self.chars()[y][x].read();
+                self.chars()[y-1][x].write(c);
             }
         }
    
-        let lines = self.buffer.height.clone() - 1;
+        let lines = BUFFER_HEIGHT - 1;
         self.clear_line(lines);
         self.column_position = 0; 
     }

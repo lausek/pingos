@@ -13,15 +13,13 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 
-#[macro_use]
-mod vga;
-
 mod memory;
-mod interrupt;
+#[macro_use]
 mod graphics;
+mod interrupt;
 
-use core::fmt::Write;
-use core::panic::PanicInfo;
+use core::{fmt::Write, panic::PanicInfo};
+use graphics::vga::macros;
 
 //#[repr(C)]
 //struct gdt_entry {
@@ -38,7 +36,7 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
 
     let boot_info = unsafe { multiboot2::load(mboot_addr) };
     
-    vga_write!("starting...");
+    vga_println!("starting...");
 
     memory::init(boot_info);
 
@@ -50,6 +48,6 @@ pub extern fn kmain(mboot_addr: usize) -> ! {
 #[panic_implementation]
 #[no_mangle]
 pub extern fn panic_fmt(pi: &PanicInfo) -> ! {
-    vga_write!("Panic in {} on {}:{}");
+    vga_println!("Panic occurred: {}", pi);
     loop {}
 }

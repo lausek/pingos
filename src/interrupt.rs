@@ -1,9 +1,7 @@
 extern crate x86_64;
 
-use interrupt::x86_64::structures::idt::{ExceptionStackFrame, Idt, PageFaultErrorCode};
-
-use vga::Writer;
 use core::fmt::Write;
+use interrupt::x86_64::structures::idt::{ExceptionStackFrame, Idt, PageFaultErrorCode};
 
 lazy_static! {
     static ref IDT: Idt = {
@@ -37,15 +35,15 @@ lazy_static! {
 }
 
 extern "x86-interrupt" fn handler(stack_frame: &mut ExceptionStackFrame) {
-    vga_write!("exception");
+    vga_println!("exception");
 }
 
 extern "x86-interrupt" fn handler_page_fault(stack_frame: &mut ExceptionStackFrame, code: PageFaultErrorCode) {
-    vga_write!("page fault");
+    vga_println!("page fault");
 }
 
 extern "x86-interrupt" fn handler_with_err_code(stack_frame: &mut ExceptionStackFrame, code: u64) {
-    vga_write!("exception with error code");
+    vga_println!("exception with error code: {}", code);
 }
 
 pub fn init() {
