@@ -1,4 +1,4 @@
-use super::{Entry, ENTRY_COUNT;
+use super::Entry;
 
 const ENTRY_COUNT: usize = 512;
 

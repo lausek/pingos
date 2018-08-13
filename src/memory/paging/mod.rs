@@ -1,4 +1,4 @@
-const ENTRY_COUNT: usize = 512;
+pub mod table;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
